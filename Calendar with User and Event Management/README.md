@@ -1,3 +1,25 @@
+
+### Calendar Page:
+
+-   Link:  [http://ec2-3-144-225-174.us-east-2.compute.amazonaws.com/~qiyuan/M5group/calendar.html#](http://ec2-3-144-225-174.us-east-2.compute.amazonaws.com/~qiyuan/M5group/calendar.html#)
+
+-   Database:-   [http://ec2-3-144-225-174.us-east-2.compute.amazonaws.com/phpmyadmin/index.php?route=/database/structure&db=calendar](http://ec2-3-144-225-174.us-east-2.compute.amazonaws.com/phpmyadmin/index.php?route=/database/structure&db=calendar)
+-   database username: calendar_inst
+-   database password: calendar_pass
+
+####  Calendar example user account:
+
+-   username: mypwis123
+-   password: 123
+-   event is in 2022-10-25
+#### User instruction:
+
+
+-   Log in, log out: On the very top of page, on the left click popup window
+-   Switching month: hit "<", ">" button on top
+-   Adding event: click on the "+" button
+-   Editing and deleting event: Click on the correspoing date, event will be displayed. Afterwards, edit and delete button will be created in each event record
+#### Features:
 1.  **AJAX Calendar (60 Points):**
     -   _**Calendar View (10 Points):**_
         -   The calendar is displayed as a table grid with days as the columns and weeks as the rows, one month at a time (5 points)
@@ -23,3 +45,11 @@
     -   _**Usability (5 Points):**_
         -   Site is intuitive to use and navigate (4 points)
         -   Site is visually appealing (1 point)
+
+	 -   _**Creative (5 Points):**_
+			-   Events are displayed within each date, click on date will show events.
+			-   Tags: When creating event, there are three tags: red, blue, green to be selected.
+			-   Create Group Event: When creating events, on the very buttom, id can be entered to create group event for others. For example :(38,41) spilted by comma if for mutiple user.
+			-   Share event: In the edit/share button, in the below section of
+
+TA: 100%
