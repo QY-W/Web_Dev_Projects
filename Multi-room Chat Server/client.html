@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Room Chat</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.rawgit.com/mervick/emojionearea/master/dist/emojionearea.min.css"
+    >
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/emojionearea/3.4.2/emojionearea.js"
+      integrity="sha512-aGWPnmdBhJ0leVHhQaRASgb0InV/Z2BWsscdj1Vwt29Oic91wECPixuXsWESpFfCcYPLfOlBZzN2nqQdMxlGTQ=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      console.log("Page is loaded");
+
+      let usernameList = [];
+      let roomList = [];
+      let curroom = "lobby";
+      let thisUsername = "";
+
+      var socketio = io.connect();
+      socketio.on("message_to_client", function (data) {
+        //Append an HR thematic break and the escaped HTML of the new message
+        document
+          .getElementById("chatlog")
+          .appendChild(document.createElement("hr"));
+        document
+          .getElementById("chatlog")
+          .appendChild(document.createTextNode(data["message"]));
+      });
+      // Alert message
+      socketio.on("alert_to_console", function (msg) {
+        alert("Alert from Server: " + msg);
+      });
+
+      // pm to
+      socketio.on("private_msg", function (msg) {
+        //private messages are in italics
+        document
+          .getElementById("chatlog")
+          .appendChild(document.createElement("hr"));
+        let tmp = document
+          .getElementById("chatlog")
+          .appendChild(document.createElement("p"));
+        tmp.appendChild(document.createTextNode(msg));
+        tmp.style.color = "magenta";
+      });
+
+      // Update userslist in the room
+      socketio.on("people_in_room", function (data) {
+        //list user names in the room
+        $("#user-list").empty();
+        let users = data.split(",");
+        usernameList = users;
+        for (let u of users) {
+          $("#user-list").append("<li>" + u + "</li>");
+        }
+      });
+
+      //socket.emit("kickout", attempt_user);
+      socketio.on("kickout", function (kickeduser) {
+        socketio.emit("back_to_lobby", kickeduser);
+        document
+          .getElementById("chatlog")
+          .appendChild(document.createElement("hr"));
+        document
+          .getElementById("chatlog")
+          .appendChild(document.createTextNode("kicked out " + kickeduser));
+      });
+
+      // Update roomlist
+      socketio.on("updateRoom", function (rooms, current_room) {
+        console.log(
+          "Before update, in room:",
+          curroom,
+          "\n change into: ",
+          current_room.roomName
+        );
+        roomList = rooms;
+        curroom = current_room.roomName;
+        $("#this-room").text("You're in room:  " + curroom);
+        $("#room-list").empty();
+        for (let i = 0; i < rooms.length; i++) {
+          let rm = rooms[i];
+          $("#room-list").append(
+            $("<li>", {
+              //value: rooms[i].roomName,
+              text: rooms[i].roomName,
+            })
+          );
+          let tmp = $("<button> Join</button>")
+            .attr("id", rm.roomName)
+            .attr("type", "button");
+          tmp.click(function () {
+            switchRoom(rooms[i]);
+          });
+          if (rooms[i].roomName != curroom) {
+            $("#room-list").append(tmp);
+          }
+        }
+      });
+
+      // Create room
+      socketio.on("create_room", function (rooms, current_room) {
+        roomList = rooms;
+        curroom = current_room;
+        console.log("cur room: ", curroom);
+        $("#room-list").empty();
+        for (let i = 0; i < rooms.length; i++) {
+          $("#room-list").append(
+            $("<li>", {
+              //value: rooms[i].roomName,
+              text: rooms[i].roomName,
+            })
+          );
+          let tmp = $("<button> Join</button>")
+            .attr("id", rooms[i].roomName)
+            .attr("type", "button");
+          tmp.click(function () {
+            switchRoom(rooms[i]);
+          });
+          if (rooms[i].roomName != curroom) {
+            $("#room-list").append(tmp);
+          }
+        }
+      });
+
+      function switchRoom(room) {
+        //redirect to the server side to actually do the switch room
+        $("#chatlog").empty();
+        console.log("Clicked the Join room btn");
+        if (room.password != null) {
+          socketio.emit(
+            "switchRoom",
+            room,
+            prompt("Enter the room password: ")
+          );
+        } else {
+          socketio.emit("switchRoom", room, "nopassword");
+        }
+      }
+
+      function sendMessage() {
+        //var nickname = document.getElementById("username_input").value;
+        if (thisUsername.length == 0) {
+          alert("Enter a username");
+          return;
+        }
+        var msg = document.getElementById("message_input").value;
+        socketio.emit("message_to_server", {
+          message: thisUsername + ": " + msg,
+        });
+      }
+
+      // login/createUser function
+      function setUsername() {
+        let inputUsername = document.getElementById("username_input").value;
+        if (inputUsername.length == 0) {
+          alert("Empty username is invalid.");
+          return;
+        }
+        usernameList.push(inputUsername);
+        thisUsername = inputUsername;
+        $("#log_notice").text("Hi! " + thisUsername);
+        socketio.emit("create_user", thisUsername);
+        //socket.on("create-username-reply",{hello:'from '})
+      }
+
+      function createRoom() {
+        let rmName = $("#create_room_input").val();
+        let passWord = $("#create_room_pw_input").val();
+        if (thisUsername.length == "") {
+          alert("Please log in.");
+          return;
+        }
+        if (rmName.length == 0) {
+          alert("Room name cannot be empty!");
+          return;
+        }
+        //check duplicated room name
+        for (let rm of roomList) {
+          if (rm == rmName) {
+            alert("This room name has been used.");
+            return;
+          }
+        }
+        roomList.push(rmName);
+        if (passWord.length == 0) {
+          passWord = null;
+        }
+        curroom = rmName;
+        socketio.emit("create_room", {
+          roomName: rmName,
+          password: passWord,
+          admin: thisUsername,
+        });
+        console.log(
+          "rm:  " + rmName + "\npw:  " + passWord + "\nadmin:  " + thisUsername
+        );
+      }
+
+      let colorDic = {
+        c1: "linear-gradient(to right, #1e0021c3, #f8731ac3)",
+        c2: "linear-gradient(to right, #6d6d6dc3, #8a8a8ac3)",
+        c3: "linear-gradient(to right, #fe2c2cc3, #2743f98b)",
+      };
+
+      $(document).ready(function () {
+        $("#message_input").emojioneArea({
+          pickerPosition: "left",
+          tonesStyle: "bullet",
+        });
+
+        $("#col-btn1").css({ background: colorDic["c1"] });
+        $("#col-btn2").css({ background: colorDic["c2"] });
+        $("#col-btn3").css({ background: colorDic["c3"] });
+
+        $(".col-btn").click(function () {
+          //alert($(this).attr("value"));
+          if ($(this).attr("value") == "cr") {
+            let randomColor1 = Math.floor(Math.random() * 16777215).toString(
+              16
+            );
+            let randomColor2 = Math.floor(Math.random() * 16777215).toString(
+              16
+            );
+            let color =
+              "linear-gradient(to right,#" +
+              randomColor1 +
+              ",#" +
+              randomColor2 +
+              ")";
+            console.log(color);
+            $("body").css({ background: color });
+            return;
+          }
+          $("body").css({ background: colorDic[$(this).attr("value")] });
+        });
+      });
+    </script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: Comic Sans MS, Cursive;
+      }
+
+      html {
+        font-size: 10px;
+        /* font-family: sans-serif; */
+        line-height: 1.6;
+      }
+
+      body {
+        background-image: linear-gradient(to right, #ffd814c3, #834290c3);
+        color: #212121;
+        font-size: 1.5em;
+      }
+
+      ul {
+        list-style: none;
+      }
+      input,
+      textarea {
+        background-color: #94939309;
+        border-radius: 10px;
+        line-height: 2em;
+      }
+      #main {
+        background: #f8f8f8a8;
+        width: 90%;
+        margin: 7em auto;
+        box-shadow: 0 1.5rem 2.5rem #18344a;
+        border-radius: 25px;
+        padding: 1.75em;
+      }
+      .flex-around {
+        display: flex;
+        justify-content: space-around;
+      }
+      #user-list,
+      #chat-rooms {
+        margin-top: 2em;
+      }
+      .flex {
+        display: flex;
+        margin-bottom: 2em;
+      }
+      .flex .flex-67 {
+        width: 67%;
+        padding-right: 1em;
+      }
+
+      .flex .flex-33 {
+        width: 33%;
+      }
+      .banner {
+        display: flex;
+        justify-content: space-between;
+      }
+      .color-buttons button {
+        border: none;
+        color: rgb(0, 0, 0);
+        padding: 15px 32px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 12px;
+        margin: 4px 2px;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="banner">
+      <h1 id="this-room">Chat Room</h1>
+      <div class="color-buttons">
+        <button type="button" class="col-btn" id="col-btn1" value="c1">
+          Color1
+        </button>
+        <button type="button" class="col-btn" id="col-btn2" value="c2">
+          Color2
+        </button>
+        <button type="button" class="col-btn" id="col-btn3" value="c3">
+          Color3
+        </button>
+        <button type="button" class="col-btn" value="cr">Random Color</button>
+      </div>
+    </div>
+    <div id="main">
+      <div class="flex">
+        <div class="flex-33">
+          <h1>Log in</h1>
+          <p id="log_notice">Hi! Please enter the username.</p>
+          <input type="text" id="username_input" required >
+          <button type="button" onclick="setUsername()">Set Username</button>
+        </div>
+        <div class="flex-33">
+          <h1>All Chat Rooms</h1>
+          <ul id="room-list">
+            <li>LOBBY</li>
+          </ul>
+        </div>
+        <div class="flex-33">
+          <h1>User in Current Room</h1>
+          <ul id="user-list"></ul>
+          <div>
+            <h3>Create Chat Room</h3>
+            Name: <input type="text" id="create_room_input" > Password:
+            (Optional)<input type="text" id="create_room_pw_input" >
+            <button type="button" onclick="createRoom()">Add</button>
+
+          </div>
+        </div>
+      </div>
+
+      <textarea id="message_input"></textarea>
+      <button type="button" onclick="sendMessage()">send message</button>
+
+      <div class="flex">
+        <div class="flex-100">
+          <h1>Chat Log</h1>
+          <div id="chatlog"></div>
+        </div>
+
+      </div>
+
+    </div>
+  </body>
+</html>
