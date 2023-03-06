@@ -20,6 +20,7 @@
 -   Editing and deleting event: Click on the correspoing date, event will be displayed. Afterwards, edit and delete button will be created in each event record
 #### Screenshot:
 <img width="959" alt="demo" src="https://user-images.githubusercontent.com/71271157/223008426-9f0c016f-39c4-4c08-b1c6-c66d632b5a46.png">
+<img width="956" alt="demo2" src="https://user-images.githubusercontent.com/71271157/223008774-f11d17f7-4d57-45d6-9e95-7e63bd217070.png">
 
 #### Features:
 1.  **AJAX Calendar (60 Points):**
