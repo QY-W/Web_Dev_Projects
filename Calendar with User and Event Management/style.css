@@ -1,0 +1,267 @@
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 10px;
+  font-family: sans-serif;
+  line-height: 1.6;
+}
+
+body {
+  background-image: linear-gradient(to right, #38718ac3, rgb(144, 63, 63));
+  color: #212121;
+  font-size: 1.5em;
+}
+
+ul {
+  list-style: none;
+}
+
+
+
+
+/* Modal Content */
+.modal-content {
+  background-color: #f6f1f1e4;
+  margin: auto;
+  padding: 20px;
+  border-radius: 10px;
+  border: 0.75px solid rgb(42, 42, 42,0.5);
+  width: 70%;
+  }
+  
+  /* The Close Button */
+  .close {
+  color: #aaaaaa;
+  float: right;
+  font-size: 32px;
+  font-weight: bold;
+  }
+  
+  .close:hover{
+  color: rgb(0, 0, 0);
+  }
+
+  #modal-btn-log{
+    margin: 1em;
+    /* text-decoration: */
+  }
+
+/* 
+Calendar Style Inspired from from https://codepen.io/TutulDevs/pen/oNbEgYx
+*/
+
+.card {
+  background: #f8f8f8a8;
+  width: 90%;
+  max-width: 40rem;
+  min-height: 40rem;
+  margin: 7em auto;
+  display: grid;
+  grid-template-rows: 8rem auto 10rem;
+  box-shadow: 0 1.5rem 2.5rem #18344a;
+  border-radius: 25px;
+}
+
+
+.card-header, .card-footer {
+  padding: 0 1.25rem;
+  color: #7D8994;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0.2rem;
+}
+.card-body {
+  padding: 1.5rem 2rem;
+  border-top: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
+}
+.card-body-days {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 4rem;
+}
+.card-body-days li {
+  flex: 1;
+  font-weight: bold;
+  text-transform: uppercase;
+  text-align: center;
+  color: #7D8994;
+  margin: 0 1px;
+}
+.card-body-dates {
+  display: grid;
+  gap: 3px;
+  grid-template-columns: repeat(7, 1fr);
+  justify-items: center;
+  text-align: center;
+}
+.card-body-dates li {
+  width: 3.5rem;
+  height: 3.5rem;
+  display: grid;
+  place-items: center;
+  font-weight: bold;
+  position: relative;
+  border-radius: 50%;
+}
+.card-body-dates li:hover{
+  background-color: #dc7b35a9;
+  border: 1px solid #f65b23cf;
+  transform: scale(1.23);
+}
+
+.display-date{
+  text-decoration: none;
+  color: #363636;
+}
+.prev .display-date, .next .display-date {
+  color:#ccc;
+}
+
+/* .card-body-dates li.prev,
+.card-body-dates li.next {
+  color: #ccc;
+} */
+/* .card-body-dates li.active {
+  background: #DE6E46;
+  color: #ffffff;
+  border-radius: 50%;
+}
+.card-body-dates li.circle {
+  border: 2px solid;
+  border-radius: 50%;
+}
+.card-body-dates li.circle span {
+  position: absolute;
+  top: -0.75rem;
+  right: -0.5rem;
+  width: 1.75rem;
+  height: 1.75rem;
+  font-size: 1.2rem;
+  color: #ffffff;
+  border-radius: 50%;
+}
+.card-body-dates .circle.orange {
+  border-color: #DE6E46;
+}
+.card-body-dates .circle.orange span {
+  background: #DE6E46;
+}
+.card-body-dates .circle.purple {
+  border-color: #AE5989;
+}
+.card-body-dates .circle.purple span {
+  background: #AE5989;
+} */
+
+.card-footer {
+  color: #333333;
+  font-weight: bold;
+}
+.card-footer .add {
+  text-decoration: none;
+  color: inherit;
+  border: 2px solid #DE6E46;
+  border-radius: 50%;
+  width: 3.5rem;
+  height: 3.5rem;
+  padding-top: 0.25rem;
+  display: grid;
+  place-items: center;
+}
+
+.tag-checkbox{
+  margin-left: 0.5em;
+  margin-right: 0.75em;
+}
+
+.add:hover, .add:focus {
+  cursor: pointer;
+  background-color:  #f6916c;
+  transform: scale(2);
+}
+
+/*  */
+/* The Modal (background) */
+.modal {
+padding-top: 10%;
+display: none; /* Hidden by default */
+position: fixed; 
+z-index: 9; 
+/* Set container to full-page */
+width: 100%; 
+height: 100%; 
+left: 0;
+top: 0;
+background-color: rgb(0,0,0,0); /* Fallback color */
+background-color: rgba(64, 64, 64, 0.75); /* Black w/ opacity */
+overflow: auto; /* Scroll if content is too long*/
+}
+
+#event-total {
+  background: #d6d6d627;
+  width: 80%;
+  
+  max-width: 80%;
+  /* min-height: 40rem; */
+  margin: 2em auto;
+  display: flex;
+  flex-direction: column;
+  /* padding-bottom: 20px; */
+  grid-template-rows: 8rem auto 10rem;
+  
+  box-shadow: 0 1rem 2.5rem #1b405e;
+  border-radius: 15px;
+  grid-auto-rows: fit-content(1em);
+
+}
+
+.event-inst{
+  width: calc(100% - 2em);
+  height: 2.5em;
+  border-radius: 15px;
+  background: #d6d6d68e;
+  display: flex;
+  /* text-align: center; */
+  margin: 0.5em 1em 0.5em 1em;
+}
+
+#event-total  li p{
+  /* position: absolute; */
+  margin: auto;
+}
+#event-total button{
+  border: none;
+  font-size: 1em;
+  font-family: sans-serif;
+  background-color: #d6d6d6cf;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  border-radius: 12px;
+  width: 60px;
+  margin-left: 10px;
+  margin-right: 0px;
+  cursor:pointer;
+
+}
+#logout-btn{
+  font-family: sans-serif;
+  border-radius: 12px;
+  background-color: #d6d6d650;
+  text-align: center;
+  text-decoration: none;
+  cursor:pointer;
+  border: none;
+  padding: 6px 22px;
+  float: right;
+  margin: 1em;
+}
+
